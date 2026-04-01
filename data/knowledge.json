@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "intents": [
+    {
+      "id": "greeting",
+      "triggers": ["hello", "hi", "hey", "good morning", "good afternoon"],
+      "answer": "Hello! Welcome to Dr. Vinod Raina's Safe Hands.What Is your name? How can I help you today?"
+    },
+    {
+      "id": "how_are_you",
+      "triggers": ["how are you", "how's it going", "how do you do"],
+      "answer": "I'm doing great, thank you for asking! I'm here to help you with any querries about our services."
+    },
+    {
+      "id": "capabilities",
+      "triggers": ["what can you do", "what do you do", "help", "services", "clinic"],
+      "answer": "I can help you book appointments, answer questions about our services, tell you about our clinic hours, and provide information about treatments. What would you like to know?"
+    },
+    {
+      "id": "services_info",
+      "triggers": ["service", "services", "treatment", "treatments", "medical services", "consultation", "checkup", "health checkup"],
+      "answer": "We offer various medical services including:\nErectile Dysfunction\nPremature Ejaculation\nNightFall Treatment\nMasturbation Treatment\nSexually Transmitted Diseases\nMale Infertility\nFemale Infertility\nLow Libido Treatment\nHuman Papillomavirus\nParaphilia\nDelayed Ejaculation\nDhat\nSide effects of Masturbation\nSexual Weakness\nSexual Timing\nAnxiety Disorders\nPerformance Disorders\nMale shyness\nDrug Indused Erectile Dysfunction\nLifestyle Erectile Dysfunction\nPhysological factors of responsible for ED\nDiabetes Induced Erectile Dysfunction\nClogged arteries can cause ED\nHigh Blood Pressure Induced ED\nProstate Induced ED\nDrugs Induced Erectile Dysfunction\nSmoking Induced Erectile Dysfunction\nAlcohol Induced Erectile Dysfunction\nHarmonal Induced Erectile Dysfunction\nProlactin Induced Erectile Dysfunction\nTestone Induced Erectile Dysfunction\nHuman Growth Harmones Induced Erectile Dysfunction\nThroyid Induced Erectile Dysfunction\nObesity Induced Erectile Dysfunction\nWeight Loss Induced Erectile Dysfunction\nTuberclose Induced Erectile Dysfunction\nHIV Induced Erectile Dysfunction\nSteroids Induced Erectile Dysfunction\nInsomnia Induced Erectile Dysfunction\nDepression Induced Erectile Dysfunction\nWorkload Induced Erectile Dysfunction\nJunkfood Induced Erectile Dysfunction\nHomosexual Induced Erectile Dysfunction\nSex Tablet Induced Erectile Dysfunction\nProtein Induced Erectile Dysfunction\nPorn Addiction Induced Erectile Dysfunction\nFollicle Stimulating Induced Erectile Dysfunction\nHerpes Induced Erectile Dysfunction\nTrichomoniasis can cause Erectile Dysfunction\nChlamydia Induced Erectile Dysfunction\nGonorrhea Induced Erectile Dysfunction\nSyphillis Induced Erectile Dysfunction\nInjury Induced Erectile Dysfunction\nHeat stroke Induced Erectile Dysfunction\nNeurological Disorder InducedED\nCancer Induced Erectile Dysfunction\nCorona Induced Erectile Dysfunction\nTyphoid Induced Erectile Dysfunction\nDengue Induced Erectile Dysfunction\nMalaria Induced Erectile Dysfunction\nLiver Cirrhosis Induced Erectile Dysfunction\nKidney Failure Induced Erectile Dysfunction\nCardiovascular Problems Induced Erectile Dysfunction\nWife Tansen Induced Erectile Dysfunction\nMyths Nightfall and Masturbation.\n\nOur experienced team is here to help with your healthcare needs."
+    },
+    {
+      "id": "booking_request",
+      "triggers": ["appointment", "book", "booking", "schedule", "timing", "date"],
+      "answer": "I'd be happy to help you book an appointment! What is your name and what type of service you need? when do you want to book the appointment? what is your phone number? {{booking_followup}}"
+    },
+    {
+      "id": "clinic_hours",
+      "triggers": ["hours", "time", "open", "clinic is open", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday","clinic hours"],
+      "answer": "Our clinic is open Monday to Saturday from 9:30 AM to 7:30 PM and on Sundays the clinic if from 11 am to 5 pm. Would you like to schedule an appointment? Our clinic is at E34 Ekta Apartments, New DElhi 110017, India"
+    },
+    {
+      "id": "thanks",
+      "triggers": ["thanks", "thank you", "thank", "appreciate"],
+      "answer": "You're very welcome! Is there anything else I can help you with today?If u want to contact customer support call on 9876543210."
+    },
+    {
+      "id": "goodbye",
+      "triggers": ["bye", "goodbye", "good night", "see you", "take care"],
+      "answer": "Thank you for contacting Dr. Vinod Raina's Safe Hands! Have a wonderful day and take care! If u want to contact customer support call on 9876543210."
+    }
+  ],
+  "fallback": "That's interesting! Based on what you've said, I think I can help you better if you tell me more specifically what you need - whether it's booking an appointment, learning about our services, or clinic information."
+}
+

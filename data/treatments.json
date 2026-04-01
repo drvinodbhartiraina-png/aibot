@@ -1,0 +1,111 @@
+{
+  "version": 1,
+  "conditions": [
+    {
+      "id": "erectile_dysfunction",
+      "name": "Erectile Dysfunction (ED)",
+      "aliases": ["ed", "erectile dysfunction", "erection problem", "can't get erection", "cannot get erection", "weak erection", "losing erection"],
+      "what_it_is": "Difficulty getting or keeping an erection firm enough for sex. It can be occasional or persistent.",
+      "how_severe_can_it_be": [
+        "Mild: occasional difficulty, often stress/fatigue related.",
+        "Moderate: happens often and affects confidence/relationship.",
+        "Severe: consistently unable to get/maintain erection; sometimes linked with diabetes, blood pressure, hormone issues, or circulation problems."
+      ],
+      "red_flags": [
+        "Chest pain, shortness of breath, or known heart disease",
+        "Sudden new ED after starting a new medicine",
+        "Painful erection, penile injury, or erection lasting >4 hours"
+      ],
+      "suggested_treatments": [
+        "Lifestyle: sleep, exercise, reduce alcohol/smoking, manage stress",
+        "Medical evaluation: blood sugar, BP, lipids, testosterone if needed",
+        "Counseling if anxiety/performance stress is a factor",
+        "Doctor-prescribed medications when appropriate"
+      ],
+      "questions_to_ask": [
+        "How long has it been happening?",
+        "Is it occasional or most of the time?",
+        "Any diabetes, BP, thyroid issues, or new medications?"
+      ]
+    },
+    {
+      "id": "premature_ejaculation",
+      "name": "Premature Ejaculation (PE)",
+      "aliases": ["premature ejaculation", "pe", "early discharge", "ejaculate too fast", "climax too fast"],
+      "what_it_is": "Ejaculating sooner than desired during sex, causing distress or difficulty in sexual satisfaction.",
+      "how_severe_can_it_be": [
+        "Mild: happens sometimes, improves with techniques.",
+        "Moderate: happens frequently and causes significant stress.",
+        "Severe: happens almost every time and affects relationships and confidence."
+      ],
+      "red_flags": [
+        "Pain, burning, discharge, or fever (possible infection)",
+        "Sudden onset with severe anxiety or depression"
+      ],
+      "suggested_treatments": [
+        "Behavioral techniques (start–stop, squeeze technique) and pelvic floor exercises",
+        "Address anxiety/stress and relationship factors",
+        "Treat underlying infections if symptoms suggest it",
+        "Doctor-prescribed options if needed"
+      ],
+      "questions_to_ask": [
+        "Is it lifelong or started recently?",
+        "Any pain/burning or urinary symptoms?",
+        "Do you also have erection issues?"
+      ]
+    },
+    {
+      "id": "std_sti",
+      "name": "Sexually Transmitted Infection (STI/STD)",
+      "aliases": ["std", "sti", "sexually transmitted disease", "infection", "burning urination", "discharge", "genital sores", "itching"],
+      "what_it_is": "Infections that can spread through sexual contact. Some cause symptoms (burning, discharge, sores) and some can be silent.",
+      "how_severe_can_it_be": [
+        "Some STIs are easily treatable with medication.",
+        "If untreated, some can cause complications like infertility or chronic pain.",
+        "Certain symptoms need urgent evaluation to prevent complications and reduce spread."
+      ],
+      "red_flags": [
+        "Fever, severe pelvic/testicular pain",
+        "Genital sores with significant pain or swelling",
+        "Blood in urine, severe burning, or inability to urinate"
+      ],
+      "suggested_treatments": [
+        "Testing first (don’t self-medicate blindly)",
+        "Avoid sex until evaluated and treated",
+        "Partner notification/treatment when applicable",
+        "Doctor-prescribed antibiotics/antivirals based on test results"
+      ],
+      "questions_to_ask": [
+        "What symptoms do you have (burning, discharge, sores)?",
+        "When did it start?",
+        "Any unprotected sex recently?"
+      ]
+    },
+    {
+      "id": "infertility",
+      "name": "Infertility (Male/Female)",
+      "aliases": ["infertility", "can't conceive", "not getting pregnant", "trying for baby", "trying to conceive"],
+      "what_it_is": "Difficulty achieving pregnancy after regular unprotected sex over time. Both male and female factors can contribute.",
+      "how_severe_can_it_be": [
+        "Often treatable once the cause is identified.",
+        "Severity depends on underlying factors (hormones, ovulation, sperm count/motility, anatomy)."
+      ],
+      "red_flags": [
+        "Severe pelvic pain, irregular heavy bleeding, or known reproductive disorders",
+        "History of STIs, surgeries, or undescended testis"
+      ],
+      "suggested_treatments": [
+        "Initial evaluation: history + basic labs + semen analysis (for male partner)",
+        "Lifestyle optimization (weight, smoking/alcohol, stress, sleep)",
+        "Treat underlying hormone or infection issues if present",
+        "Referral options depending on findings"
+      ],
+      "questions_to_ask": [
+        "How long have you been trying?",
+        "Age of both partners?",
+        "Any known conditions (PCOS, thyroid, diabetes) or prior infections?"
+      ]
+    }
+  ]
+}
+

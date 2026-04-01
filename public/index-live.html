@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Chat</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -moz-background-clip: text;
+            -ms-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .status.connected {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+        .status.connecting {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+        .status.disconnected {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 15px 30px;
+            margin: 5px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .connect-btn {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+        }
+        .connect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+        }
+        .disconnect-btn {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            color: white;
+        }
+        .disconnect-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(244, 67, 54, 0.4);
+        }
+        .disconnect-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .live-indicator {
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #ff4757, #ff3742);
+            color: white;
+            border-radius: 20px;
+            font-size: 14px;
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: blink 1s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        .transcript {
+            background: rgba(248, 249, 250, 0.9);
+            border: 1px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .transcript h3 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+        .message {
+            margin: 15px 0;
+            padding: 12px 16px;
+            border-radius: 18px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .user {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #2196f3;
+            margin-left: auto;
+            text-align: right;
+        }
+        .ai {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            border-left: 4px solid #9c27b0;
+            margin-right: auto;
+        }
+        .interim {
+            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+            border-left: 4px solid #ff9800;
+            margin-right: auto;
+            opacity: 0.8;
+            font-style: italic;
+        }
+        .info {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            margin: 15px 0;
+        }
+        .volume-meter {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .volume-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A);
+            width: 0%;
+            transition: width 0.1s ease;
+            border-radius: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Voice Chat</h1>
+        
+        <div id="status" class="status disconnected">
+            Disconnected from AI server
+        </div>
+        
+        <div class="controls">
+            <button id="connectBtn" class="connect-btn">Start</button>
+            <button id="disconnectBtn" class="disconnect-btn" disabled>Stop</button>
+        </div>
+        
+        <div id="liveIndicator" class="live-indicator" style="display: none;">
+            <div class="live-dot"></div>
+            LIVE - Talk / Interrupt anytime
+        </div>
+        
+        <div class="volume-meter">
+            <div id="volumeBar" class="volume-bar"></div>
+        </div>
+        
+        <div class="info">
+            Click Start, allow microphone, then speak naturally.
+        </div>
+        
+        <div class="transcript">
+            <h3>📝 Live Conversation</h3>
+            <div id="messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let recognition = null;
+        let isListening = false;
+        let isSpeaking = false;
+        let currentUtterance = null;
+        let lastAiText = '';
+        let speakingSince = 0;
+        let audioContext = null;
+        let analyser = null;
+        let micStream = null;
+        let micSource = null;
+        let recognitionStoppedByUser = false;
+        let recognitionRestartTimer = null;
+        let recognitionBackoffMs = 250;
+        let lastSentText = '';
+        let lastSentAt = 0;
+        let flushTimer = null;
+        let lastInterimText = '';
+        
+        const statusEl = document.getElementById('status');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const messagesEl = document.getElementById('messages');
+        const liveIndicator = document.getElementById('liveIndicator');
+        const volumeBar = document.getElementById('volumeBar');
+        
+        function addMessage(text, type, isInterim = false) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${isInterim ? 'interim' : type}`;
+            messageEl.textContent = `${type === 'user' ? '👤 You:' : type === 'ai' ? '🤖 AI:' : 'ℹ️'} ${text}`;
+            
+            if (isInterim) {
+                // Remove previous interim message
+                const prevInterim = messagesEl.querySelector('.interim');
+                if (prevInterim) {
+                    prevInterim.remove();
+                }
+            }
+            
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        function updateStatus(status, message) {
+            statusEl.textContent = message;
+            statusEl.className = `status ${status}`;
+        }
+        
+        function updateVolumeBar() {
+            if (!analyser || !isListening) return;
+            
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            analyser.getByteFrequencyData(dataArray);
+            
+            const average = dataArray.reduce((a, b) => a + b) / dataArray.length;
+            const volume = Math.min(100, (average / 128) * 100);
+            volumeBar.style.width = volume + '%';
+            
+            requestAnimationFrame(updateVolumeBar);
+        }
+
+        async function initMicMeter() {
+            if (!navigator.mediaDevices?.getUserMedia) return;
+            if (micStream) return;
+
+            micStream = await navigator.mediaDevices.getUserMedia({
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            });
+
+            audioContext = audioContext || new (window.AudioContext || window.webkitAudioContext)();
+            analyser = audioContext.createAnalyser();
+            analyser.fftSize = 512;
+
+            micSource = audioContext.createMediaStreamSource(micStream);
+            micSource.connect(analyser);
+            updateVolumeBar();
+        }
+
+        function stopMicMeter() {
+            try { micSource && micSource.disconnect(); } catch {}
+            micSource = null;
+            analyser = null;
+            if (micStream) {
+                try { micStream.getTracks().forEach(t => t.stop()); } catch {}
+            }
+            micStream = null;
+            volumeBar.style.width = '0%';
+        }
+
+        function normalizeText(t) {
+            return String(t || '')
+                .toLowerCase()
+                .replace(/[^\p{L}\p{N}\s]+/gu, ' ')
+                .replace(/\s+/g, ' ')
+                .trim();
+        }
+
+        function shouldSendText(t) {
+            const now = Date.now();
+            const norm = normalizeText(t);
+            const lastNorm = normalizeText(lastSentText);
+            if (!norm) return false;
+            if (norm.length < 2) return false;
+            if (lastNorm && (norm === lastNorm || norm.startsWith(lastNorm) || lastNorm.startsWith(norm))) {
+                if ((now - lastSentAt) < 2500) return false;
+            }
+            return true;
+        }
+
+        function sendUserText(t) {
+            const trimmed = String(t || '').trim();
+            if (!trimmed) return;
+            if (!shouldSendText(trimmed)) return;
+            lastSentText = trimmed;
+            lastSentAt = Date.now();
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({ type: 'user_text', text: trimmed }));
+            }
+        }
+        
+        function pickVoice() {
+            const voices = window.speechSynthesis?.getVoices?.() || [];
+            const preferred = voices.find(v => /en/i.test(v.lang) && /google|natural|neural|microsoft/i.test(v.name));
+            return preferred || voices.find(v => /en/i.test(v.lang)) || voices[0] || null;
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+
+            // Barge-in: stop any previous AI speech before speaking a new answer
+            window.speechSynthesis.cancel();
+
+            const utter = new SpeechSynthesisUtterance(text);
+            const voice = pickVoice();
+            if (voice) utter.voice = voice;
+            utter.rate = 1.02;
+            utter.pitch = 1.0;
+            utter.volume = 1.0;
+
+            utter.onstart = () => {
+                isSpeaking = true;
+                speakingSince = Date.now();
+            };
+            utter.onend = () => {
+                isSpeaking = false;
+            };
+            utter.onerror = () => {
+                isSpeaking = false;
+            };
+
+            currentUtterance = utter;
+            window.speechSynthesis.speak(utter);
+        }
+
+        function ensureMicPermission() {
+            // Forces the mic permission prompt up-front for better UX
+            return navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+                stream.getTracks().forEach(t => t.stop());
+            });
+        }
+
+        function startContinuousListening() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                addMessage('This browser does not support SpeechRecognition. Use Chrome/Edge.', 'info');
+                return;
+            }
+
+            recognitionStoppedByUser = false;
+
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                addMessage('Listening...', 'info');
+                recognitionBackoffMs = 250;
+            };
+
+            recognition.onresult = (event) => {
+                let interim = '';
+                let finalText = '';
+                let bestChunkConfidence = 0;
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    const confidence = event.results[i][0].confidence || 0;
+                    if (confidence > bestChunkConfidence) bestChunkConfidence = confidence;
+                    if (event.results[i].isFinal) finalText += transcript;
+                    else interim += transcript;
+                }
+
+                const interimTrimmed = interim.trim();
+                const finalTrimmed = finalText.trim();
+
+                // Echo guard: while AI is speaking, ignore transcripts that look like the AI's own voice
+                const looksLikeEcho = (t) => {
+                    const x = normalizeText(t);
+                    const y = normalizeText(lastAiText);
+                    if (!x || !y) return false;
+                    if (x.length < 6) return true; // tiny blips are usually noise/echo
+                    return y.includes(x) || x.includes(y.slice(0, Math.min(40, y.length)));
+                };
+
+                // Barge-in: if user speaks while AI is talking, stop AI immediately.
+                // We only barge-in on a non-echo transcript and a small minimum length.
+                if (isSpeaking && 'speechSynthesis' in window) {
+                    const candidate = (finalTrimmed || interimTrimmed);
+                    const longEnough = candidate && candidate.length >= 3;
+                    const notEcho = candidate && !looksLikeEcho(candidate);
+                    const notTooSoon = (Date.now() - speakingSince) > 250; // avoid instant self-trigger
+                    const confidentEnough = bestChunkConfidence >= 0.25 || candidate.split(/\s+/).length >= 2;
+                    if (longEnough && notEcho && notTooSoon && confidentEnough) {
+                        window.speechSynthesis.cancel();
+                        isSpeaking = false;
+                    } else {
+                        // If it's likely echo/noise, ignore it (don't show interim bubble)
+                        return;
+                    }
+                }
+
+                if (interimTrimmed) addMessage(interimTrimmed, 'interim', true);
+                lastInterimText = interimTrimmed;
+
+                // If the browser never emits a final result, flush the latest interim after a short pause.
+                if (flushTimer) clearTimeout(flushTimer);
+                flushTimer = setTimeout(() => {
+                    const candidate = (lastInterimText || '').trim();
+                    if (!candidate) return;
+                    // Avoid flushing while AI is speaking unless the user clearly barged-in.
+                    if (isSpeaking && looksLikeEcho(candidate)) return;
+                    addMessage(candidate, 'user');
+                    sendUserText(candidate);
+                    lastInterimText = '';
+                    const prevInterim = messagesEl.querySelector('.interim');
+                    if (prevInterim) prevInterim.remove();
+                }, 900);
+
+                if (finalTrimmed) {
+                    if (flushTimer) clearTimeout(flushTimer);
+                    const prevInterim = messagesEl.querySelector('.interim');
+                    if (prevInterim) prevInterim.remove();
+                    addMessage(finalTrimmed, 'user');
+                    sendUserText(finalTrimmed);
+                }
+            };
+
+            recognition.onerror = (e) => {
+                console.error('Speech recognition error:', e);
+                // Some errors are transient; try to restart with backoff.
+                if (recognitionStoppedByUser) return;
+                const err = (e && e.error) ? String(e.error) : '';
+                if (err === 'not-allowed' || err === 'service-not-allowed') {
+                    addMessage('Microphone permission was blocked. Please allow mic access and try again.', 'info');
+                    return;
+                }
+            };
+
+            recognition.onend = () => {
+                // Keep it alive while connected (unless we explicitly stopped)
+                if (recognitionStoppedByUser) return;
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
+                    const delay = Math.min(2500, recognitionBackoffMs);
+                    recognitionRestartTimer = setTimeout(() => {
+                        try { recognition.start(); } catch {}
+                    }, delay);
+                    recognitionBackoffMs = Math.min(2500, Math.floor(recognitionBackoffMs * 1.6));
+                }
+            };
+
+            try { recognition.start(); } catch {}
+        }
+
+        function stopContinuousListening() {
+            recognitionStoppedByUser = true;
+            if (recognitionRestartTimer) clearTimeout(recognitionRestartTimer);
+            recognitionRestartTimer = null;
+            if (flushTimer) clearTimeout(flushTimer);
+            flushTimer = null;
+            try { recognition && recognition.stop(); } catch {}
+            recognition = null;
+            isListening = false;
+            volumeBar.style.width = '0%';
+            addMessage('Stopped listening', 'info');
+        }
+        
+        function connectWebSocket() {
+            updateStatus('connecting', 'Connecting to AI server...');
+            
+            const wsUrl = `${location.protocol === 'https:' ? 'wss' : 'ws'}://${location.host}`;
+            ws = new WebSocket(wsUrl);
+            
+            ws.onopen = () => {
+                console.log('Connected to WebSocket');
+                updateStatus('connected', 'Connected to AI voice agent');
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                liveIndicator.style.display = 'inline-flex';
+                
+                // Start mic meter + continuous listening
+                initMicMeter().catch(() => {});
+                startContinuousListening();
+                addMessage('Connected. Start speaking!', 'ai');
+            };
+            
+            ws.onmessage = (event) => {
+                console.log('Received message:', event.data);
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.type === 'ai_text' && data.text) {
+                        lastAiText = data.text;
+                        addMessage(data.text, 'ai');
+                        speak(data.text);
+                    }
+                } catch (e) {
+                    console.log('Non-JSON message:', event.data);
+                    addMessage(event.data, 'ai');
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                updateStatus('disconnected', 'Disconnected from AI server');
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                liveIndicator.style.display = 'none';
+                stopContinuousListening();
+                stopMicMeter();
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateStatus('disconnected', 'Connection error');
+            };
+        }
+        
+        connectBtn.addEventListener('click', () => {
+            ensureMicPermission()
+                .then(() => connectWebSocket())
+                .catch(() => addMessage('Microphone permission is required.', 'info'));
+        });
+        
+        disconnectBtn.addEventListener('click', () => {
+            stopContinuousListening();
+            if (ws) {
+                ws.close();
+            }
+        });
+        
+        // Auto-connect on page load
+        window.addEventListener('load', () => {
+            // Some browsers populate voices asynchronously
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.onvoiceschanged = () => pickVoice();
+                pickVoice();
+            }
+            addMessage('Welcome! Click Start to talk with the AI.', 'info');
+        });
+    </script>
+</body>
+</html>

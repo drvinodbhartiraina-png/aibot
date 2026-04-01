@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Voice Agent Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            padding: 12px 24px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        .start-btn {
+            background-color: #28a745;
+            color: white;
+        }
+        .start-btn:hover {
+            background-color: #218838;
+        }
+        .stop-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+        .stop-btn:hover {
+            background-color: #c82333;
+        }
+        .stop-btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .transcript {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            min-height: 100px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .transcript h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        .message {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .user {
+            background-color: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+        .ai {
+            background-color: #f3e5f5;
+            border-left: 4px solid #9c27b0;
+        }
+        .info {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 AI Voice Agent Test Interface</h1>
+        
+        <div id="status" class="status disconnected">
+            Disconnected from AI server
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" class="start-btn">🎤 Start Conversation</button>
+            <button id="stopBtn" class="stop-btn" disabled>⏹️ Stop Conversation</button>
+            <button id="testBtn" class="start-btn">🔊 Test Audio</button>
+        </div>
+        
+        <div class="info">
+            Click "Start Conversation" and allow microphone access to begin testing the AI voice agent
+        </div>
+        
+        <div class="transcript">
+            <h3>Conversation Transcript</h3>
+            <div id="messages"></div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let mediaRecorder = null;
+        let audioContext = null;
+        let isRecording = false;
+        
+        const statusEl = document.getElementById('status');
+        const startBtn = document.getElementById('startBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const messagesEl = document.getElementById('messages');
+        
+        function addMessage(text, type) {
+            const messageEl = document.createElement('div');
+            messageEl.className = `message ${type}`;
+            messageEl.textContent = `${type === 'user' ? '👤 You:' : '🤖 AI:'} ${text}`;
+            messagesEl.appendChild(messageEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        function updateStatus(connected) {
+            if (connected) {
+                statusEl.textContent = 'Connected to AI server';
+                statusEl.className = 'status connected';
+            } else {
+                statusEl.textContent = 'Disconnected from AI server';
+                statusEl.className = 'status disconnected';
+            }
+        }
+        
+        function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:3001');
+            
+            ws.onopen = () => {
+                console.log('Connected to WebSocket');
+                updateStatus(true);
+                addMessage('Connected to AI voice agent', 'ai');
+            };
+            
+            ws.onmessage = (event) => {
+                console.log('Received message:', event.data);
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.event === 'media' && data.media && data.media.payload) {
+                        // Play the audio response
+                        playAudio(data.media.payload);
+                        // Also display the text
+                        if (data.media.text) {
+                            addMessage(data.media.text, 'ai');
+                        }
+                    } else if (data.type === 'response') {
+                        addMessage(data.text, 'ai');
+                    } else if (data.type === 'transcript') {
+                        addMessage(data.text, 'user');
+                    }
+                } catch (e) {
+                    console.log('Non-JSON message:', event.data);
+                    // Fallback for text messages
+                    addMessage(event.data, 'ai');
+                }
+            };
+            
+            ws.onclose = () => {
+                console.log('WebSocket disconnected');
+                updateStatus(false);
+                stopRecording();
+            };
+            
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                updateStatus(false);
+            };
+        }
+        
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0 && ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(event.data);
+                    }
+                };
+                
+                mediaRecorder.start(100); // Send data every 100ms
+                isRecording = true;
+                startBtn.disabled = true;
+                stopBtn.disabled = false;
+                addMessage('Recording started... Speak now!', 'info');
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                addMessage('Error: Could not access microphone', 'error');
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                addMessage('Recording stopped', 'info');
+            }
+        }
+        
+        function playAudio(base64Audio) {
+            try {
+                console.log('Playing audio from base64...');
+                const audioBlob = base64ToBlob(base64Audio, 'audio/mpeg');
+                playAudioFromBlob(audioBlob);
+            } catch (error) {
+                console.error('Error playing audio:', error);
+                addMessage('Audio playback failed, but you can read the response above.', 'info');
+            }
+        }
+        
+        function playAudioFromBlob(audioBlob) {
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play().catch(error => {
+                console.error('Error playing audio:', error);
+            });
+            
+            // Clean up the URL after playback
+            audio.addEventListener('ended', () => {
+                URL.revokeObjectURL(audioUrl);
+            });
+        }
+        
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], { type: mimeType });
+        }
+        
+        startBtn.addEventListener('click', () => {
+            if (!ws || ws.readyState !== WebSocket.OPEN) {
+                connectWebSocket();
+            }
+            setTimeout(startRecording, 1000);
+        });
+        
+        stopBtn.addEventListener('click', () => {
+            stopRecording();
+            if (ws) {
+                ws.close();
+            }
+        });
+        
+        testBtn.addEventListener('click', () => {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                // Send a test message to trigger AI response
+                ws.send(JSON.stringify({
+                    type: 'test',
+                    text: 'hello'
+                }));
+                addMessage('Testing audio...', 'info');
+            } else {
+                addMessage('Please connect first by clicking Start Conversation', 'error');
+            }
+        });
+        
+        // Auto-connect on page load
+        connectWebSocket();
+    </script>
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Dr. Vinod Raina Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #111;
+    }
+    .card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 24px;
+      border-radius: 15px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      backdrop-filter: blur(10px);
+    }
+    h1 { margin-top: 0; }
+    .row { margin: 12px 0; }
+    label { display: block; font-weight: bold; margin-bottom: 6px; }
+    input[type="file"], input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+    }
+    textarea { height: 220px; font-family: Consolas, monospace; font-size: 12px; }
+    button {
+      padding: 12px 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, #4CAF50, #45a049);
+      color: white;
+    }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+    .status {
+      margin-top: 14px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #f3f4f6;
+      white-space: pre-wrap;
+    }
+    .hint {
+      font-size: 13px;
+      color: #444;
+      line-height: 1.4;
+    }
+    code { font-family: Consolas, monospace; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Upload Dr. Vinod Raina Data</h1>
+    <p class="hint">
+      Upload a JSON object for <code>data/dr-raina.json</code>. Recommended keys:
+      <code>clinicName</code>, <code>doctorName</code>, <code>welcomeMessage</code>, <code>farewellMessage</code>,
+      <code>supportPhone</code>, <code>address</code>, and <code>clinicHours</code>.
+    </p>
+
+    <div class="row">
+      <label>Optional admin token (if your server is configured with <code>DR_ADMIN_TOKEN</code>)</label>
+      <input id="adminToken" type="text" placeholder="Paste admin token here (optional)" />
+    </div>
+
+    <div class="row">
+      <label>Select JSON file</label>
+      <input id="fileInput" type="file" accept="application/json,.json" />
+    </div>
+
+    <div class="row">
+      <label>JSON preview (editable)</label>
+      <textarea id="jsonPreview" placeholder="Choose a file to preview JSON..."></textarea>
+    </div>
+
+    <div class="row">
+      <button id="uploadBtn" disabled>Upload</button>
+      <div id="status" class="status">No file selected.</div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+    const jsonPreview = document.getElementById('jsonPreview');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const statusEl = document.getElementById('status');
+    const adminTokenEl = document.getElementById('adminToken');
+
+    let currentData = null;
+
+    function setStatus(msg) {
+      statusEl.textContent = msg;
+    }
+
+    function setData(data) {
+      currentData = data;
+      jsonPreview.value = JSON.stringify(data, null, 2);
+      uploadBtn.disabled = false;
+      setStatus('Ready to upload. Click Upload.');
+    }
+
+    fileInput.addEventListener('change', () => {
+      const file = fileInput.files && fileInput.files[0];
+      if (!file) {
+        currentData = null;
+        jsonPreview.value = '';
+        uploadBtn.disabled = true;
+        setStatus('No file selected.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const text = String(reader.result || '');
+          const parsed = JSON.parse(text);
+          if (!parsed || typeof parsed !== 'object') throw new Error('JSON root must be an object.');
+          setData(parsed);
+        } catch (e) {
+          uploadBtn.disabled = true;
+          setStatus('Invalid JSON: ' + (e && e.message ? e.message : String(e)));
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    uploadBtn.addEventListener('click', async () => {
+      try {
+        const text = jsonPreview.value;
+        const parsed = JSON.parse(text);
+        if (!parsed || typeof parsed !== 'object') throw new Error('JSON root must be an object.');
+
+        uploadBtn.disabled = true;
+        setStatus('Uploading...');
+
+        const token = (adminTokenEl.value || '').trim();
+        const res = await fetch('/api/admin/dr-raina', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...(token ? { 'x-admin-token': token } : {})
+          },
+          body: JSON.stringify({ data: parsed })
+        });
+
+        const bodyText = await res.text();
+        if (!res.ok) {
+          throw new Error('Upload failed (' + res.status + '): ' + bodyText);
+        }
+
+        setStatus('Upload successful. Server saved updated Dr. Vinod Raina data.');
+      } catch (e) {
+        uploadBtn.disabled = false;
+        setStatus('Error: ' + (e && e.message ? e.message : String(e)));
+      }
+    });
+  </script>
+</body>
+</html>
+

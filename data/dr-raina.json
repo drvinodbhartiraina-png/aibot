@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "clinicName": "Dr.Raina's Safe Hands",
+  "doctorName": "Dr. Vinod Raina",
+  "welcomeMessage": "Welcome to Dr. Vinod Raina's Safe Hands. How can I help you today?",
+  "farewellMessage": "Thank you for contacting Dr. Vinod Raina's Safe Hands! Have a wonderful day and take care!",
+  "supportPhone": ["9567891061","9567891072"],
+  "tagline": "Best sexologist in Delhi, India and one of the best in Asia",
+  "address": "E34 Ekta Apartments,Saket ,New Delhi 110017, India, Near Malviya Nagar Metro Station Gate Num 4",
+  "clinicHours": {
+    "mondayToSaturday": "9:30 AM to 7:30 PM",
+    "sunday": "11 AM to 5 PM",
+    "timezone": "Asia/Kolkata"
+  },
+  "aboutDoctorVinodRaina": {  
+    "achievments": "Over 100,000 successful treatments, 99% patient satisfaction rate, 100% privacy guaranteed",
+    "certifications": "Board Certified in Sexology, Member of the American College of Sexologists, Member of the International Society of Sexual Medicine",
+    "awards": "Best Sexologist in Delhi, India, Best Sexologist in Asia, Best Sexologist in the World",
+    "publications": "Over 100 publications in peer-reviewed journals, Over 1000 presentations at international conferences",
+    "education": "Doctor of Medicine in Sexology,specializes in Sexual Medicine and Sexology, Md in Medicine",
+    "experience": "Over 26 years of experience in sexology, Over 100,000 successful treatments, 99% patient satisfaction rate, 100% privacy guaranteed",
+    "specializations": "Sexual Dysfunction, Sexual Pain, Sexual Health, Sexual Behavior, Sexual Medicine, etc.",
+    "patient_testimonials": "Over 1000 patient testimonials, 99% patient satisfaction rate, 100% privacy guaranteed",
+    "patient_feedback": "Over 1000 patient feedback, 99% patient satisfaction rate, 100% privacy guaranteed",
+    "patient_reviews": "Over 1000 patient reviews, 99% patient satisfaction rate, 100% privacy guaranteed",
+    "patient_stories": "Over 1000 patient stories, 99% patient satisfaction rate, 100% privacy guaranteed"
+  }
+}
+

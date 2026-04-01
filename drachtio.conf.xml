@@ -1,0 +1,16 @@
+<drachtio>
+  <admin port="9022" secret="cymru">0.0.0.0</admin>
+  <sip>
+    <contacts>
+      <contact>sip:*:5060</contact>
+    </contacts>
+  </sip>
+  <rtp-proxies>
+      <rtp-proxy address="rtpengine" port="22222"/>
+    </rtp-proxies>
+    <logging>
+      <console/>
+      <loglevel>debug</loglevel>
+      <sofia-loglevel>9</sofia-loglevel>
+    </logging>
+  </drachtio>

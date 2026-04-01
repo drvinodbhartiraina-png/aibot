@@ -1,0 +1,14 @@
+{
+  # Change this email to yours (Let's Encrypt notifications)
+  email you@example.com
+}
+
+# Replace the host below with your real domain (recommended):
+# e.g. voice.yourdomain.com
+voice.yourdomain.com {
+  encode gzip
+
+  # WebSocket + HTTP reverse proxy to your Node app
+  reverse_proxy 127.0.0.1:4000
+}
+

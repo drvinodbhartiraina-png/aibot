@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<drachtio-config>
+  <drachtio>
+    <admin port="9022" secret="cymru">0.0.0.0</admin>
+    <transports>
+      <transport protocol="udp" port="5060">*</transport>
+      <transport protocol="tcp" port="5060">*</transport>
+    </transports>
+    <rtp-proxies>
+      <rtp-proxy address="rtpengine" port="22222"/>
+    </rtp-proxies>
+  </drachtio>
+</drachtio-config>

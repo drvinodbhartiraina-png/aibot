@@ -1,0 +1,16 @@
+services:
+  drachtio:
+    image: drachtio/drachtio-server:latest
+    ports:
+      - "5060:5060/udp"
+      - "5060:5060/tcp"
+      - "9022:9022/tcp"
+    volumes:
+      - ./drachtio.conf.xml:/etc/drachtio.conf.xml
+    command: drachtio -f /etc/drachtio.conf.xml
+
+  rtpengine:
+    image: drachtio/rtpengine:latest
+    command: rtpengine --interface "172.17.0.1!127.0.0.1" --listen-ng "127.0.0.1:22222"
+    ports:
+      - "30000-30050:30000-30050/udp"
